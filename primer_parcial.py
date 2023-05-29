@@ -381,8 +381,7 @@ def imprimir_menu():
     print("18. Mostrar jugadores con un porcentaje de tiros triples superior a un valor dado.")
     print("19. Calcular y mostrar el jugador con la mayor cantidad de temporadas jugadas.")
     print("20. Mostrar jugadores ordenados por posición en la cancha con un porcentaje de tiros de campo superior a un valor dado.")
-    print("21. Bonus")
-    print("22. Exit")
+    print("21. Exit")
 
 def menu():
     imprimir_menu()
@@ -480,6 +479,7 @@ def menu():
             #Opcion 21: Salir
             case 21:
                 break
+
 
 def main():
     #Ejecuta la app
