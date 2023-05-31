@@ -358,43 +358,120 @@ def solicitar_mostrar_segun_clave_ordenar_segun_posicion(lista_jugadores:dict):
         mensaje = f"{posicion_del_jugador} - {nombre_del_jugador} - {porcentaje_tiros_de_campo}"
         imprimir_dato(mensaje)
 
+# 23 BONUS - Calcular de cada jugador cuál es su posición en cada uno de los siguientes ranking:
+# Puntos - Rebotes - Asistencias - Robos. Exportar a csv.
+def imprimir_tabla(lista_jugadores_ordenada:list) -> None:
+    '''
+    Recibe una lista de jugadores.
+    Imprime el formato de una tabla y recorre la lista agregando filas a la tabla, con 
+    los valores solicitados en cada columna.
+    '''
+    largo = 103
+    imprimir_dato("-".center(largo,"-"))
+    imprimir_dato("|               JUGADOR              |   PUNTOS     |   REBOTES     |   ASISTENCIA    |   ROBOS       |")
+    imprimir_dato("-".center(largo,"-"))
+    for jugador in lista_jugadores_ordenada:
+        nombre_del_jugador = jugador["nombre"]
+        puntos = jugador["estadisticas"]["puntos_totales"]
+        rebotes = jugador["estadisticas"]["rebotes_totales"]
+        asistencia = jugador["estadisticas"]["asistencias_totales"]
+        robos = jugador["estadisticas"]["robos_totales"]
+
+        imprimir_dato(f"|   {str(nombre_del_jugador).center(19)}   |   {str(puntos).center(12)}   |   {str(rebotes).center(12)}   |   {str(asistencia).center(12)}   |   {str(robos).center(12)}   |")
+        imprimir_dato("-".center(largo,"-"))
+
+def crear_lista_ordenada_segun_indice(lista_jugadores:list) -> list:
+    '''
+    Recibe una lista de diccionarios.
+    Crea una lista y ordenas sus indices de manera descendente de las claves: 
+    Puntos - Rebotes - Asistencias - Robos.
+    Devuelve la lista que contiene a los diccionarios de jugadores con el numero de indice en el que 
+    se encuentra en comparacion a otros jugadores, como valor en las claves especificadas.
+    '''
+    lista_copia = lista_jugadores[:]
+
+    lista_estadisticas = ["rebotes_totales", "asistencias_totales", "robos_totales", "puntos_totales"]
+    for estadistica in lista_estadisticas:
+        lista_ordenada = ordenar_por_clave_doble(lista_copia, "estadisticas", estadistica, False)
+        jugadores_con_estadisticas = []
+
+        for i in range(len(lista_ordenada)):
+            jugador = lista_ordenada[i]
+            nombre = jugador["nombre"]
+            jugador["estadisticas"][estadistica] = i + 1
+            jugador_modificado = {
+                "nombre": nombre,
+                "estadisticas": jugador["estadisticas"]
+            }
+            jugadores_con_estadisticas.append(jugador_modificado)
+
+    return jugadores_con_estadisticas
+
+def convertir_a_texto(datos_obtenidos) -> str:
+    '''
+    Recibe una lista de diccionarios.
+    Toma una lista de valores lo cuales uniendo los elementos y agregandolos a una lista, dan como 
+    resultado los valeres de las filas de las tablas.
+    Devuelve la nueva lista convertida en string.
+    '''
+    if isinstance(datos_obtenidos, list):
+        lista_claves = ["nombre", "asistencias totales", "puntos_totales", "rebotes_totales", "robos_totales"]
+        filas = []
+
+        for jugador in datos_obtenidos:
+            valores = [str(jugador["nombre"]), str(jugador["estadisticas"]["asistencias_totales"]),
+                        str(jugador["estadisticas"]["puntos_totales"]),  str(jugador["estadisticas"]["rebotes_totales"]),
+                        str(jugador["estadisticas"]["robos_totales"])]
+            fila = ",".join(valores)
+            filas.append(fila)
+
+        claves_str = ",".join(lista_claves)
+        datos_para_filas = "{0}\n{1}".format(claves_str, "\n".join(filas))
+
+        return datos_para_filas
+
+    else:
+        return ""
+
 #----------------------------------MENU - MAIN-------------------------------------------------------------------------------------------
 def imprimir_menu():
-    print("\nMenú de opciones:\n")
-    print("1. Mostrar lista de jugadores del Dream Team.")
-    print("2. Ver estadísticas completas de un jugador seleccionado.")
-    print("3. Guardar estadísticas de un jugador en un archivo .")
-    print("4. Buscar un jugador por nombre y mostrar sus logros.")
-    print("5. Calcular y mostrar el promedio de puntos por partido de todo el equipo del Dream Team, ordenado por nombre.")
-    print("6. Verificar si un jugador es miembro del Salón de la Fama del Baloncesto.")
-    print("7. Calcular y mostrar el jugador con la mayor cantidad de rebotes totales.")
-    print("8. Calcular y mostrar el jugador con el mayor porcentaje de tiros de campo.")
-    print("9. Calcular y mostrar el jugador con la mayor cantidad de asistencias totales.")
-    print("10. Mostrar jugadores que promediaron más puntos por partido que un valor dado.")
-    print("11. Mostrar jugadores que promediaron más rebotes por partido que un valor dado.")
-    print("12. Mostrar jugadores que promediaron más asistencias por partido que un valor dado.")
-    print("13. Calcular y mostrar el jugador con la mayor cantidad de robos totales.")
-    print("14. Calcular y mostrar el jugador con la mayor cantidad de bloqueos totales.")
-    print("15. Mostrar jugadores con un porcentaje de tiros libres superior a un valor dado.")
-    print("16. Calcular y mostrar el promedio de puntos por partido del equipo excluyendo al jugador con la menor cantidad de puntos por partido.")
-    print("17. Calcular y mostrar el jugador con la mayor cantidad de logros obtenidos.")
-    print("18. Mostrar jugadores con un porcentaje de tiros triples superior a un valor dado.")
-    print("19. Calcular y mostrar el jugador con la mayor cantidad de temporadas jugadas.")
-    print("20. Mostrar jugadores ordenados por posición en la cancha con un porcentaje de tiros de campo superior a un valor dado.")
-    print("21. Exit")
+    imprimir_dato("\nMenú de opciones:\n")
+    imprimir_dato("1. Mostrar lista de jugadores del Dream Team.")
+    imprimir_dato("2. Ver estadísticas completas de un jugador seleccionado.")
+    imprimir_dato("3. Guardar estadísticas de un jugador en un archivo.")
+    imprimir_dato("4. Buscar un jugador por nombre y mostrar sus logros.")
+    imprimir_dato("5. Calcular y mostrar el promedio de puntos por partido de todo el equipo del Dream Team, ordenado por nombre.")
+    imprimir_dato("6. Verificar si un jugador es miembro del Salón de la Fama del Baloncesto.")
+    imprimir_dato("7. Calcular y mostrar el jugador con la mayor cantidad de rebotes totales.")
+    imprimir_dato("8. Calcular y mostrar el jugador con el mayor porcentaje de tiros de campo.")
+    imprimir_dato("9. Calcular y mostrar el jugador con la mayor cantidad de asistencias totales.")
+    imprimir_dato("10. Mostrar jugadores que promediaron más puntos por partido que un valor dado.")
+    imprimir_dato("11. Mostrar jugadores que promediaron más rebotes por partido que un valor dado.")
+    imprimir_dato("12. Mostrar jugadores que promediaron más asistencias por partido que un valor dado.")
+    imprimir_dato("13. Calcular y mostrar el jugador con la mayor cantidad de robos totales.")
+    imprimir_dato("14. Calcular y mostrar el jugador con la mayor cantidad de bloqueos totales.")
+    imprimir_dato("15. Mostrar jugadores con un porcentaje de tiros libres superior a un valor dado.")
+    imprimir_dato("16. Calcular y mostrar el promedio de puntos por partido del equipo excluyendo al jugador con la menor cantidad de puntos por partido.")
+    imprimir_dato("17. Calcular y mostrar el jugador con la mayor cantidad de logros obtenidos.")
+    imprimir_dato("18. Mostrar jugadores con un porcentaje de tiros triples superior a un valor dado.")
+    imprimir_dato("19. Calcular y mostrar el jugador con la mayor cantidad de temporadas jugadas.")
+    imprimir_dato("20. Mostrar jugadores ordenados por posición en la cancha con un porcentaje de tiros de campo superior a un valor dado.")
+    imprimir_dato("23. Bonus - Posición en cada uno de los siguientes ranking: Puntos - Rebotes - Asistencias - Robos")
+    imprimir_dato("21. Exit")
 
 def menu():
-    imprimir_menu()
-    opcion = int(input("Ingrese una opcion: "))
 
     while True:
+        imprimir_menu()
+        opcion = int(input("Ingrese una opcion: "))
+        mensaje = None
+
         match opcion:
             case 1:
                 mostrar_jugadores(lista_jugadores)
 
             case 2:
-                dato = mostrar_segun_indice(lista_jugadores)
-                imprimir_dato(dato)
+                mensaje = mostrar_segun_indice(lista_jugadores)
 
             case 3:
                 ruta_archivo = "/home/luli/Escritorio/programacion_1/primer_parcial/jugador.csv"
@@ -415,21 +492,18 @@ def menu():
                 nombre_jugador_maximo = jugador_maximo["nombre"]
                 valor_maximo = jugador_maximo["estadisticas"]["rebotes_totales"]
                 mensaje = f"{nombre_jugador_maximo}: {valor_maximo}"
-                imprimir_dato(mensaje)
                 
             case 8:
                 jugador_maximo = calcular_maximo(lista_jugadores, "estadisticas", "porcentaje_tiros_de_campo")
                 nombre_jugador_maximo = jugador_maximo["nombre"]
                 valor_maximo = jugador_maximo["estadisticas"]["porcentaje_tiros_de_campo"]
                 mensaje = f"{nombre_jugador_maximo}: {valor_maximo} %"
-                imprimir_dato(mensaje)
 
             case 9:
                 jugador_maximo = calcular_maximo(lista_jugadores, "estadisticas", "asistencias_totales")
                 nombre_jugador_maximo = jugador_maximo["nombre"]
                 valor_maximo = jugador_maximo["estadisticas"]["asistencias_totales"]
                 mensaje = f"{nombre_jugador_maximo}: {valor_maximo}"
-                imprimir_dato(mensaje)
 
             case 10:
                 solicitar_mostrar_maximo_segun_clave(lista_jugadores, "promedio_puntos_por_partido")
@@ -445,14 +519,12 @@ def menu():
                 nombre_jugador_maximo = jugador_maximo["nombre"]
                 valor_maximo = jugador_maximo["estadisticas"]["robos_totales"]
                 mensaje = f"{nombre_jugador_maximo}: {valor_maximo}"
-                imprimir_dato(mensaje)
                 
             case 14:
                 jugador_maximo = calcular_maximo(lista_jugadores, "estadisticas", "bloqueos_totales")
                 nombre_jugador_maximo = jugador_maximo["nombre"]
                 valor_maximo = jugador_maximo["estadisticas"]["bloqueos_totales"]
                 mensaje = f"{nombre_jugador_maximo}: {valor_maximo}"
-                imprimir_dato(mensaje)
 
             case 15:
                 solicitar_mostrar_maximo_segun_clave(lista_jugadores, "porcentaje_tiros_libres")
@@ -471,15 +543,23 @@ def menu():
                 nombre_jugador_maximo = jugador_maximo["nombre"]
                 valor_maximo = jugador_maximo["estadisticas"]["temporadas"]
                 mensaje = f"{nombre_jugador_maximo}: {valor_maximo}"
-                imprimir_dato(mensaje)
                 
             case 20:
                 solicitar_mostrar_segun_clave_ordenar_segun_posicion(lista_jugadores)
+
+            case 23:
+                ranking_jugadores = crear_lista_ordenada_segun_indice(lista_jugadores)
+                datos_filas = convertir_a_texto(ranking_jugadores)
+                imprimir_tabla(ranking_jugadores)
+                ruta_archivo = "tabla_ranking.csv"
+                guardar_archivo(ruta_archivo, datos_filas)
 
             #Opcion 21: Salir
             case 21:
                 break
 
+        if mensaje is not None:
+            imprimir_dato(mensaje)        
 
 def main():
     #Ejecuta la app
