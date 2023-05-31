@@ -574,8 +574,7 @@ def buscar_maximo_segun_key(lista_jugadores:list) -> None:
             if max_jugador is None or estadistica_total > max_puntaje:
                 max_jugador = jugador
     
-        nombre_jugador_maximo = max_jugador["nombre"]
-        return f"El jugador que tiene las mejores estadísticas: {nombre_jugador_maximo}"
+        return "jugador tiene las mejores estadísticas: {0} con la suma total de: {1}".format(max_jugador["nombre"] , estadistica_total)
     else:
         return "Error, la lista esta vacia."
 
