@@ -184,7 +184,7 @@ def calcular_imprimir_ordenados_alfabeticamente_promedio(lista_jugadores) -> Non
     for jugador in lista_ordenada:
         nombre_jugador = jugador["nombre"]
         promedio_puntos = jugador["estadisticas"]["promedio_puntos_por_partido"]
-        mensaje += f"{nombre_jugador}: {promedio_puntos}"
+        mensaje += f"{nombre_jugador}: {promedio_puntos} \n"
 
     return mensaje    
 
@@ -214,7 +214,7 @@ def buscar_clave_jugador(jugador_encontrado:dict) -> None:
 # 13 - Calcular y mostrar el jugador con la mayor cantidad de robos totales.
 # 14 - Calcular y mostrar el jugador con la mayor cantidad de bloqueos totales.
 # 19 - Calcular y mostrar el jugador con la mayor cantidad de temporadas jugadas
-def calcular_maximo(lista_jugadores:list, primera_clave:str, segunda_clave:str) -> dict:
+def calcular_maximo_doble_clave(lista_jugadores:list, primera_clave:str, segunda_clave:str) -> dict:
     '''
     Recibe una lista de diccionarios, y dos claves.
     Busca el valor maximo segun las claves especificadas en la lista.
@@ -229,7 +229,7 @@ def calcular_maximo(lista_jugadores:list, primera_clave:str, segunda_clave:str) 
             jugador_maximo = jugador
 
     return jugador_maximo
-
+ 
 # 10 - Permitir al usuario ingresar un valor y mostrar los jugadores que han promediado 
 # más puntos por partido que ese valor.
 # 11 - Permitir al usuario ingresar un valor y mostrar los jugadores que han 
@@ -302,7 +302,7 @@ def calcular_mostrar_clave_segun_jugador():
         nombre_jugador = jugador["nombre"]
         valor_encontrado = jugador["estadisticas"]["promedio_puntos_por_partido"]
         valor_encontrado = round(valor_encontrado, 2)
-        mensaje += f'{nombre_jugador}: {valor_encontrado}'
+        mensaje += f'{nombre_jugador}: {valor_encontrado} \n'
         
     return mensaje
 
@@ -371,7 +371,7 @@ def solicitar_mostrar_segun_clave_ordenar_segun_posicion(lista_jugadores:dict):
         nombre_del_jugador = jugador["nombre"]
         porcentaje_tiros_de_campo = jugador["estadisticas"]["porcentaje_tiros_de_campo"]
 
-        mensaje += f"{posicion_del_jugador} - {nombre_del_jugador} - {porcentaje_tiros_de_campo}"
+        mensaje += f"{posicion_del_jugador} - {nombre_del_jugador} - {porcentaje_tiros_de_campo} \n"
 
     return mensaje  
 
@@ -449,6 +449,135 @@ def convertir_a_texto(datos_obtenidos) -> str:
 
     else:
         return ""
+    
+# 24 - Determinar la cantidad de jugadores que hay por cada posición. Ejemplo: Base: 2 Alero: 3
+def contador_segun_posicion(lista_jugadores:list) -> str:
+    '''
+    Recibe una lista de diccionarios.
+    Cuenta segun una clave especifica, en este caso posicion la cantidad de valores posibles para
+    esa clave.
+    Devuelve un string que contiene el detalle de los valores encontrados.
+    '''
+    contador_base = 0
+    contador_alero = 0
+    contador_escolta = 0
+    contador_ala_pivot = 0
+    contador_pivot = 0
+
+    for jugador in lista_jugadores: 
+        if jugador["posicion"] == "Base":
+            contador_base += 1
+        elif jugador["posicion"] == "Alero":
+            contador_alero += 1
+        elif jugador["posicion"] == "Escolta":
+            contador_escolta += 1
+        elif jugador["posicion"] == "Ala-Pivot":
+            contador_ala_pivot += 1
+        elif jugador["posicion"] == "Pivot":
+            contador_pivot += 1
+    mensaje = f"Base: {contador_base}\nAlero: {contador_alero}\nEscolta: {contador_escolta}\n"
+    mensaje += f"Ala-Pivot: {contador_ala_pivot}\nPivot: {contador_pivot}"
+    return mensaje
+
+# 25 - Mostrar la lista de jugadores ordenadas por la cantidad de All-Star de forma descendente. 
+# La salida por pantalla debe tener un formato similar a este: Michael Jordan (14 veces All Star)
+def ordenar_descendiente_segun_clave(lista_jugadores:list) -> str:
+    '''
+    Recibe una lista de diccionarios.
+    Busca segun la clave logros que es una lista de strings los que coincidan con All-Star, saco el valor 
+    numero y lo convierto a un numero entero a partir del cual voy a ordenar la nueva lista creada.
+    Devuelvo la nueva lista con el nombre del jugador y la clave especifica ordenada de forma descendente.
+    '''
+    lista_segun_clave = []
+
+    for jugadores in lista_jugadores:
+        logros = jugadores["logros"]
+
+        for logro in logros:
+            if re.search("veces All-Star", logro):
+                all_star = re.findall(r'\d+', logro)
+                all_star = ",".join(all_star) 
+                all_star = int(all_star)
+                jugador_modificado = {
+                    "Nombre": jugadores["nombre"],
+                    "All Star": all_star
+                }
+
+                if len(jugador_modificado) > 0:
+                    lista_segun_clave.append(jugador_modificado)
+
+    lista_ordenada_segun_clave = ordenar_por_clave(lista_segun_clave, "All Star", False)
+
+    cadena = ""
+    for jugador in lista_ordenada_segun_clave:
+        cadena += f"{jugador['Nombre']} ({jugador['All Star']} veces All Star)\n"
+
+    return cadena
+
+# 26 - Determinar qué jugador tiene las mejores estadísticas en cada valor. 
+# La salida por pantalla debe tener un formato similar a este: Mayor cantidad de temporadas: Karl Malone (19)
+def calcular_maximo(lista_jugadores:list, primera_clave:str):
+    """
+    Recibe una lista de diccionarios, y dos claves.
+    Busca el valor máximo según las claves especificadas en la lista.
+    Devuelve el diccionario del jugador máximo.
+    """
+    valor_maximo = 0
+    jugador_maximo = None
+
+    for jugador in lista_jugadores:
+        valor = jugador["estadisticas"].get(primera_clave, 0)
+        if valor > valor_maximo:
+            valor_maximo = valor
+            jugador_maximo = jugador
+
+    return jugador_maximo
+
+def maximo_segun_estadisticas(lista_jugadores:list) -> str:
+    '''
+    Recibe una lista de diccionarios.
+    Recorre el diccionario de estadisticas y busca el mayor en cada clave de todos los 
+    jugadores.
+    Devuelve un mensaje contodos las claves de estadisticas y los jugadores que ocupan
+    el primer lugar en ellas.
+    '''
+    mensaje = ""
+    for jugador in lista_jugadores:
+        for clave in jugador["estadisticas"]:
+            max_estadisticas = calcular_maximo(lista_jugadores, clave)
+            nombre_max_estadisticas = max_estadisticas["nombre"]
+            valor_max_estadisticas = max_estadisticas["estadisticas"][clave]
+            mensaje += f"{clave}: {nombre_max_estadisticas} - {valor_max_estadisticas}\n"
+
+        if clave == "porcentaje_tiros_triples":
+            break
+
+    return mensaje
+ 
+# 27- Determinar qué jugador tiene las mejores estadísticas de todos
+def buscar_maximo_segun_key(lista_jugadores:list) -> None:
+    """
+    Recibe una lista de diccionarios.
+    Recorre la lista, y por cada jugador suma los valores que tienen en las claves
+    de estadisticas, y los compara con el resto de los jugadores hasta que termina de 
+    recorrer la lista y se queda con el maximo.
+    Devuelve un mensaje con los valores del maximo.
+    """
+    if lista_jugadores:
+        max_jugador = None
+        max_puntaje = 0
+
+        for jugador in lista_jugadores:
+            estadistica_total = 0
+            for estadistica in jugador["estadisticas"].values():
+                estadistica_total += estadistica
+            if max_jugador is None or estadistica_total > max_puntaje:
+                max_jugador = jugador
+    
+        nombre_jugador_maximo = max_jugador["nombre"]
+        return f"El jugador que tiene las mejores estadísticas: {nombre_jugador_maximo}"
+    else:
+        return "Error, la lista esta vacia."
 
 #----------------------------------MENU - MAIN-------------------------------------------------------------------------------------------
 def imprimir_menu():
@@ -475,6 +604,9 @@ def imprimir_menu():
     imprimir_dato("20. Mostrar jugadores ordenados por posición en la cancha con un porcentaje de tiros de campo superior a un valor dado.")
     imprimir_dato("23. Bonus - Posición en cada uno de los siguientes ranking: Puntos - Rebotes - Asistencias - Robos")
     imprimir_dato("24. Determinar la cantidad de jugadores que hay por cada posición. Ejemplo: Base: 2 Alero: 3")
+    imprimir_dato("25. Mostrar la lista de jugadores ordenadas por la cantidad de All-Star de forma descendente." )
+    imprimir_dato("26. Determinar qué jugador tiene las mejores estadísticas en cada valor.")
+    imprimir_dato("27. Determinar qué jugador tiene las mejores estadísticas de todos")
     imprimir_dato("21. Exit")
 
 def menu():
@@ -506,19 +638,19 @@ def menu():
                 mensaje = buscar_clave_jugador(buscar_jugador_por_nombre(lista_jugadores))
 
             case 7:
-                jugador_maximo = calcular_maximo(lista_jugadores, "estadisticas", "rebotes_totales")
+                jugador_maximo = calcular_maximo_doble_clave(lista_jugadores, "estadisticas", "rebotes_totales")
                 nombre_jugador_maximo = jugador_maximo["nombre"]
                 valor_maximo = jugador_maximo["estadisticas"]["rebotes_totales"]
                 mensaje = f"{nombre_jugador_maximo}: {valor_maximo}"
                 
             case 8:
-                jugador_maximo = calcular_maximo(lista_jugadores, "estadisticas", "porcentaje_tiros_de_campo")
+                jugador_maximo = calcular_maximo_doble_clave(lista_jugadores, "estadisticas", "porcentaje_tiros_de_campo")
                 nombre_jugador_maximo = jugador_maximo["nombre"]
                 valor_maximo = jugador_maximo["estadisticas"]["porcentaje_tiros_de_campo"]
                 mensaje = f"{nombre_jugador_maximo}: {valor_maximo} %"
 
             case 9:
-                jugador_maximo = calcular_maximo(lista_jugadores, "estadisticas", "asistencias_totales")
+                jugador_maximo = calcular_maximo_doble_clave(lista_jugadores, "estadisticas", "asistencias_totales")
                 nombre_jugador_maximo = jugador_maximo["nombre"]
                 valor_maximo = jugador_maximo["estadisticas"]["asistencias_totales"]
                 mensaje = f"{nombre_jugador_maximo}: {valor_maximo}"
@@ -533,13 +665,13 @@ def menu():
                 mensaje = solicitar_mostrar_maximo_segun_clave(lista_jugadores, "promedio_asistencias_por_partido")
 
             case 13:
-                jugador_maximo = calcular_maximo(lista_jugadores, "estadisticas", "robos_totales")
+                jugador_maximo = calcular_maximo_doble_clave(lista_jugadores, "estadisticas", "robos_totales")
                 nombre_jugador_maximo = jugador_maximo["nombre"]
                 valor_maximo = jugador_maximo["estadisticas"]["robos_totales"]
                 mensaje = f"{nombre_jugador_maximo}: {valor_maximo}"
                 
             case 14:
-                jugador_maximo = calcular_maximo(lista_jugadores, "estadisticas", "bloqueos_totales")
+                jugador_maximo = calcular_maximo_doble_clave(lista_jugadores, "estadisticas", "bloqueos_totales")
                 nombre_jugador_maximo = jugador_maximo["nombre"]
                 valor_maximo = jugador_maximo["estadisticas"]["bloqueos_totales"]
                 mensaje = f"{nombre_jugador_maximo}: {valor_maximo}"
@@ -557,7 +689,7 @@ def menu():
                 mensaje = solicitar_mostrar_maximo_segun_clave(lista_jugadores, "porcentaje_tiros_triples")
                 
             case 19:
-                jugador_maximo = calcular_maximo(lista_jugadores, "estadisticas", "temporadas")
+                jugador_maximo = calcular_maximo_doble_clave(lista_jugadores, "estadisticas", "temporadas")
                 nombre_jugador_maximo = jugador_maximo["nombre"]
                 valor_maximo = jugador_maximo["estadisticas"]["temporadas"]
                 mensaje = f"{nombre_jugador_maximo}: {valor_maximo}"
@@ -571,6 +703,18 @@ def menu():
                 imprimir_tabla(ranking_jugadores)
                 ruta_archivo = "tabla_ranking.csv"
                 guardar_archivo(ruta_archivo, datos_filas)
+
+            case 24:
+                mensaje = contador_segun_posicion(lista_jugadores)
+
+            case 25:
+                mensaje = ordenar_descendiente_segun_clave(lista_jugadores)
+
+            case 26:
+                mensaje = maximo_segun_estadisticas(lista_jugadores)
+
+            case 27: 
+                mensaje = buscar_maximo_segun_key(lista_jugadores)
 
             #Opcion 21: Salir
             case 21:
