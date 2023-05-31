@@ -26,11 +26,24 @@ def mostrar_jugadores(lista_jugadores) -> str:
     Lo recorre. Toma el nombre y la posicion para luego
     imprimirlo por consola.
     '''
+    mensaje = ""
+
     for jugador in lista_jugadores:
         nombre = jugador["nombre"]
         posicion = jugador["posicion"]
-        mensaje = f"{nombre} - {posicion}"
-        imprimir_dato(mensaje)
+        mensaje += f"{nombre} - {posicion}"
+    
+    return mensaje
+
+def validar_entero():
+    opcion = input("Ingrese un numero: ")
+
+    if re.match("^[0-9]{1,2}$", opcion):
+        opcion = int(opcion)
+    else:
+        return -1
+
+    return opcion
 
 # 2 - Permitir al usuario seleccionar un jugador por su índice y mostrar sus estadísticas completas, 
 # incluyendo temporadas jugadas, puntos totales, promedio de puntos por partido, rebotes totales, 
@@ -45,7 +58,7 @@ def mostrar_segun_indice(lista_jugadores:list) -> str:
     '''
     lista = []
     
-    indice_del_jugador = int(input("\nIngrese el indice del jugador: "))
+    indice_del_jugador = validar_entero()
     if indice_del_jugador < 0 or indice_del_jugador >= len(lista_jugadores):
         imprimir_dato("Indice de jugador invalido.")
     else:
@@ -106,14 +119,16 @@ def imprimir_logros_jugador(jugador_encontrado:dict) -> str:
     Si el jugador no es un diccionario vacio entonces imprime el nombre
     y sus logros.
     '''
-    
+    mensaje = ""
+
     if jugador_encontrado is not None:
         logros = jugador_encontrado["logros"]
         logros = "\n".join(logros)
-        mensaje = f"Logros de {jugador_encontrado['nombre']}: \n{logros}"
-        imprimir_dato(mensaje)
+        mensaje = f"Logros de {jugador_encontrado['nombre']}: \n{logros}"   
     else:
-        imprimir_dato("Jugador no encontrado.")
+        mensaje = "Jugador no encontrado."
+    
+    return mensaje
 
 # 5 - Calcular y mostrar el promedio de puntos por partido de todo el equipo del Dream Team, 
 # ordenado por nombre de manera ascendente. 
@@ -164,16 +179,18 @@ def calcular_imprimir_ordenados_alfabeticamente_promedio(lista_jugadores) -> Non
     lista_ordenada = ordenar_por_clave(lista_jugadores, "nombre", True)
     promedio = calcular_promedio(lista_ordenada, "estadisticas" ,"promedio_puntos_por_partido")
     imprimir_dato(f"El promedio del Equipo es: {promedio}")
+    mensaje = ""
 
     for jugador in lista_ordenada:
         nombre_jugador = jugador["nombre"]
         promedio_puntos = jugador["estadisticas"]["promedio_puntos_por_partido"]
-        mensaje = f"{nombre_jugador}: {promedio_puntos}"
-        imprimir_dato(mensaje)
+        mensaje += f"{nombre_jugador}: {promedio_puntos}"
+
+    return mensaje    
 
 # 6 - Permitir al usuario ingresar el nombre de un jugador y mostrar si ese jugador
 # es miembro del Salón de la Fama del Baloncesto.
-def imprimir_clave_jugador(jugador_encontrado:dict) -> None:
+def buscar_clave_jugador(jugador_encontrado:dict) -> None:
     '''
     Recibe el diccionario de un jugador.
     Verifica si el jugador tiene un string perteneciente a una de sus claves.
@@ -189,7 +206,7 @@ def imprimir_clave_jugador(jugador_encontrado:dict) -> None:
             else: 
                 mensaje = "El jugador no es miembro del Salon de la Fama del Baloncesto"
 
-    imprimir_dato(mensaje)
+    return mensaje
 
 # 7 - Calcular y mostrar el jugador con la mayor cantidad de rebotes totales.
 # 8 - Calcular y mostrar el jugador con el mayor porcentaje de tiros de campo.
@@ -229,20 +246,17 @@ def solicitar_mostrar_maximo_segun_clave(lista_jugadores:list, clave:str) -> lis
     Solicita el valor a partir del cual desea buscar segun la clave especificada,
     lo valida e imprime los jugadores que cumplen con lo solicitado.
     '''
-    valor_ingresado = input("Ingrese el valor que desea buscar: ")
+    mensaje = ""
+    valor_ingresado = validar_entero()
+    clave_normalizada = clave.replace("_", " ")
 
-    if re.match("^[0-9]{1,2}$", valor_ingresado): 
-        valor_ingresado = int(valor_ingresado)
-        clave_normalizada = clave.replace("_", " ")
-
-        for jugador in lista_jugadores:
-            if jugador["estadisticas"][clave] > valor_ingresado:
-                nombre_encontrado = jugador["nombre"]
-                valor_encontrado = jugador["estadisticas"][clave]
-                mensaje = f"\n{nombre_encontrado} | {clave_normalizada}: {valor_encontrado}"
-                imprimir_dato(mensaje)
-    else:
-        imprimir_dato("Valor invalido, ingrese un numero entero.")
+    for jugador in lista_jugadores:
+        if jugador["estadisticas"][clave] > valor_ingresado:
+            nombre_encontrado = jugador["nombre"]
+            valor_encontrado = jugador["estadisticas"][clave]
+            mensaje += f"\n{nombre_encontrado} | {clave_normalizada}: {valor_encontrado} \n"
+            
+    return mensaje        
 
 # 16 - Calcular y mostrar el promedio de puntos por partido del equipo 
 # excluyendo al jugador con la menor cantidad de puntos por partido.
@@ -278,6 +292,7 @@ def calcular_mostrar_clave_segun_jugador():
     '''
     lista_ordenada = ordenar_por_clave_doble(lista_jugadores, "estadisticas", "promedio_puntos_por_partido", True)
     del lista_ordenada[0]
+    mensaje = ""
 
     promedio = calcular_promedio(lista_ordenada,"estadisticas" ,"promedio_puntos_por_partido")
     mensaje_promedio = f"El promedio de puntos por partidos sin el peor jugador es: {promedio}"
@@ -287,8 +302,9 @@ def calcular_mostrar_clave_segun_jugador():
         nombre_jugador = jugador["nombre"]
         valor_encontrado = jugador["estadisticas"]["promedio_puntos_por_partido"]
         valor_encontrado = round(valor_encontrado, 2)
-        mensaje = f'{nombre_jugador}: {valor_encontrado}'
-        imprimir_dato(mensaje)
+        mensaje += f'{nombre_jugador}: {valor_encontrado}'
+        
+    return mensaje
 
 # 17 - Calcular y mostrar el jugador con la mayor cantidad de logros obtenidos
 def maxima_cantidad_logros(lista_jugadores:list) -> None:
@@ -304,7 +320,7 @@ def maxima_cantidad_logros(lista_jugadores:list) -> None:
             valor_maximo = cantidad_logros
             nombre_jugador_maximo = jugador["nombre"]
 
-    imprimir_dato(nombre_jugador_maximo)
+    return nombre_jugador_maximo
 
 # 20 - Permitir al usuario ingresar un valor y mostrar los jugadores, ordenados por
 #  posición en la cancha, que hayan tenido un porcentaje de tiros de campo superior a ese valor.
@@ -326,8 +342,7 @@ def filtrar_jugadores_por_estadistica(lista_jugadores: list, clave: str) -> list
     en caso de que no devuelve un mensaje que informa que no hay jugadores que cumplan con lo ingresado.
     """
     jugadores_filtrados = []
-    valor_ingresado = input("Ingresa un valor: ")
-    valor_ingresado = validar_opcion_expresion(r'^[0-9]{1,2}$', valor_ingresado)
+    valor_ingresado = validar_entero()
     no_encontrado = True
 
     if valor_ingresado:
@@ -349,14 +364,16 @@ def solicitar_mostrar_segun_clave_ordenar_segun_posicion(lista_jugadores:dict):
     '''
     lista_filtrada = filtrar_jugadores_por_estadistica(lista_jugadores, "porcentaje_tiros_de_campo")
     lista_odenada = ordenar_por_clave(lista_filtrada , "posicion", True)
+    mensaje = ""
 
     for jugador in lista_odenada:
         posicion_del_jugador = jugador["posicion"]
         nombre_del_jugador = jugador["nombre"]
         porcentaje_tiros_de_campo = jugador["estadisticas"]["porcentaje_tiros_de_campo"]
 
-        mensaje = f"{posicion_del_jugador} - {nombre_del_jugador} - {porcentaje_tiros_de_campo}"
-        imprimir_dato(mensaje)
+        mensaje += f"{posicion_del_jugador} - {nombre_del_jugador} - {porcentaje_tiros_de_campo}"
+
+    return mensaje  
 
 # 23 BONUS - Calcular de cada jugador cuál es su posición en cada uno de los siguientes ranking:
 # Puntos - Rebotes - Asistencias - Robos. Exportar a csv.
@@ -457,18 +474,19 @@ def imprimir_menu():
     imprimir_dato("19. Calcular y mostrar el jugador con la mayor cantidad de temporadas jugadas.")
     imprimir_dato("20. Mostrar jugadores ordenados por posición en la cancha con un porcentaje de tiros de campo superior a un valor dado.")
     imprimir_dato("23. Bonus - Posición en cada uno de los siguientes ranking: Puntos - Rebotes - Asistencias - Robos")
+    imprimir_dato("24. Determinar la cantidad de jugadores que hay por cada posición. Ejemplo: Base: 2 Alero: 3")
     imprimir_dato("21. Exit")
 
 def menu():
 
     while True:
         imprimir_menu()
-        opcion = int(input("Ingrese una opcion: "))
+        opcion = validar_entero()
         mensaje = None
 
         match opcion:
             case 1:
-                mostrar_jugadores(lista_jugadores)
+                mensaje = mostrar_jugadores(lista_jugadores)
 
             case 2:
                 mensaje = mostrar_segun_indice(lista_jugadores)
@@ -479,13 +497,13 @@ def menu():
                 guardar_archivo(ruta_archivo, datos_para_guardar)
 
             case 4:
-                imprimir_logros_jugador(buscar_jugador_por_nombre(lista_jugadores))
+                mensaje = imprimir_logros_jugador(buscar_jugador_por_nombre(lista_jugadores))
 
             case 5:
-                calcular_imprimir_ordenados_alfabeticamente_promedio(lista_jugadores)
+                mensaje = calcular_imprimir_ordenados_alfabeticamente_promedio(lista_jugadores)
 
             case 6:
-                imprimir_clave_jugador(buscar_jugador_por_nombre(lista_jugadores))
+                mensaje = buscar_clave_jugador(buscar_jugador_por_nombre(lista_jugadores))
 
             case 7:
                 jugador_maximo = calcular_maximo(lista_jugadores, "estadisticas", "rebotes_totales")
@@ -506,13 +524,13 @@ def menu():
                 mensaje = f"{nombre_jugador_maximo}: {valor_maximo}"
 
             case 10:
-                solicitar_mostrar_maximo_segun_clave(lista_jugadores, "promedio_puntos_por_partido")
+                mensaje = solicitar_mostrar_maximo_segun_clave(lista_jugadores, "promedio_puntos_por_partido")
 
             case 11:
-                solicitar_mostrar_maximo_segun_clave(lista_jugadores, "promedio_rebotes_por_partido")
+                mensaje = solicitar_mostrar_maximo_segun_clave(lista_jugadores, "promedio_rebotes_por_partido")
         
             case 12:
-                solicitar_mostrar_maximo_segun_clave(lista_jugadores, "promedio_asistencias_por_partido")
+                mensaje = solicitar_mostrar_maximo_segun_clave(lista_jugadores, "promedio_asistencias_por_partido")
 
             case 13:
                 jugador_maximo = calcular_maximo(lista_jugadores, "estadisticas", "robos_totales")
@@ -527,16 +545,16 @@ def menu():
                 mensaje = f"{nombre_jugador_maximo}: {valor_maximo}"
 
             case 15:
-                solicitar_mostrar_maximo_segun_clave(lista_jugadores, "porcentaje_tiros_libres")
+                mensaje = solicitar_mostrar_maximo_segun_clave(lista_jugadores, "porcentaje_tiros_libres")
                 
             case 16:
-                calcular_mostrar_clave_segun_jugador()
+                mensaje = calcular_mostrar_clave_segun_jugador()
 
             case 17:
-                maxima_cantidad_logros(lista_jugadores)
+                mensaje = maxima_cantidad_logros(lista_jugadores)
 
             case 18:
-                solicitar_mostrar_maximo_segun_clave(lista_jugadores, "porcentaje_tiros_triples")
+                mensaje = solicitar_mostrar_maximo_segun_clave(lista_jugadores, "porcentaje_tiros_triples")
                 
             case 19:
                 jugador_maximo = calcular_maximo(lista_jugadores, "estadisticas", "temporadas")
@@ -545,7 +563,7 @@ def menu():
                 mensaje = f"{nombre_jugador_maximo}: {valor_maximo}"
                 
             case 20:
-                solicitar_mostrar_segun_clave_ordenar_segun_posicion(lista_jugadores)
+                mensaje = solicitar_mostrar_segun_clave_ordenar_segun_posicion(lista_jugadores)
 
             case 23:
                 ranking_jugadores = crear_lista_ordenada_segun_indice(lista_jugadores)
@@ -557,6 +575,9 @@ def menu():
             #Opcion 21: Salir
             case 21:
                 break
+
+            case _:
+                mensaje = "Opcion invalida. Intente nuevamente"
 
         if mensaje is not None:
             imprimir_dato(mensaje)        
